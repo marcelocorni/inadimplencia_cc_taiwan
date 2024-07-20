@@ -125,6 +125,9 @@ elif selection == 'Análise e Tratamento de Dados':
     # tratamento da coluna EDUCATION agrupar os valores que dizem a mesma coisa em um único valor
     df['EDUCATION'] = df['EDUCATION'].replace({0: 4, 5: 4, 6: 4})
 
+    df['AVG_PAY'] = df['AVG_PAY'].fillna(0.0)
+    df['AVG_PAY_AMT'] = df['AVG_PAY_AMT'].fillna(0.0)
+    
     df['DEFAULT_PAYMENT'] = df['DEFAULT_PAYMENT'].fillna(0.0)
     df['DEFAULT_PAYMENT'] = df['DEFAULT_PAYMENT'].astype(int)
 
