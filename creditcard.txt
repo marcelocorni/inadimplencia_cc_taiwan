@@ -1,0 +1,26 @@
+Existem 25 variáveis:
+ID : ID de cada cliente
+LIMIT_BAL : Valor do crédito fornecido em dólares NT (inclui crédito individual e familiar/suplementar
+SEXO : Gênero (1=masculino, 2=feminino)
+EDUCAÇÃO : (1=pós-graduação, 2=universidade, 3=ensino médio, 4=outros, 5=desconhecido, 6=desconhecido)
+CASAMENTO : Estado civil (1=casado, 2=solteiro, 3=outros)
+IDADE : Idade em anos
+PAY_0 : Situação do pagamento em setembro de 2005 (0=rotativo, -2=sem consumo, -1=pagar em dia, 1=atraso no pagamento por um mês, 2=atraso no pagamento por dois meses)
+PAY_2 : Situação de reembolso em agosto de 2005 (escala igual à acima)
+PAY_3 : Situação de reembolso em julho de 2005 (escala igual à acima)
+PAY_4 : Situação de reembolso em junho de 2005 (escala igual à acima)
+PAY_5 : Situação de reembolso em maio de 2005 (escala igual à acima)
+PAY_6 : Situação de reembolso em abril de 2005 (escala igual à acima)
+BILL_AMT1 : Valor da fatura em setembro de 2005 (dólar NT)
+BILL_AMT2 : Valor da fatura em agosto de 2005 (dólar NT)
+BILL_AMT3 : Valor da fatura em julho de 2005 (dólar NT)
+BILL_AMT4 : Valor da fatura em junho de 2005 (dólar NT)
+BILL_AMT5 : Valor da fatura em maio de 2005 (dólar NT)
+BILL_AMT6 : Valor da fatura em abril de 2005 (dólar NT)
+PAY_AMT1 : Valor do pagamento anterior em setembro de 2005 (dólar NT)
+PAY_AMT2 : Valor do pagamento anterior em agosto de 2005 (dólar NT)
+PAY_AMT3 : Valor do pagamento anterior em julho de 2005 (dólar NT)
+PAY_AMT4 : Valor do pagamento anterior em junho de 2005 (dólar NT)
+PAY_AMT5 : Valor do pagamento anterior em maio de 2005 (dólar NT)
+PAY_AMT6 : Valor do pagamento anterior em abril de 2005 (dólar NT)
+default.payment.next.month : Pagamento padrão (1=sim, 0=não)
