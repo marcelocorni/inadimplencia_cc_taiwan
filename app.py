@@ -409,24 +409,62 @@ elif selection == 'Outliers e Normalização':
 
 
 elif selection == 'Conclusões':
+     # Adicionar coluna de inadimplência
+    df['INADIMPLENTE'] = df['DEFAULT_PAYMENT']
+
     st.header('Conclusões')
 
     st.write('''
     1. **Média de Atrasos de Pagamento (AVG_PAY):**
-        - Clientes com uma média de atrasos mais alta tendem a ter uma maior probabilidade de inadimplência.
+        - Clientes com uma média de atrasos mais alta tendem a ter uma maior probabilidade de inadimplência.''')
     
-    2. **Média das Faturas (AVG_BILL_AMT):**
-        - Clientes com faturas médias mais altas também mostram uma tendência maior para inadimplência, especialmente quando combinado com altos atrasos médios.
-    
-    3. **Média dos Pagamentos (AVG_PAY_AMT):**
-        - Clientes que pagam valores médios mais baixos em relação às suas faturas tendem a ser mais propensos a inadimplência.
-    
-    4. **Limite de Crédito e Idade:**
-        - Embora não seja um indicador isolado forte, combinações de alto limite de crédito com idades extremas (muito jovens ou mais velhos) podem também indicar uma maior propensão para inadimplência.
-    
-    5. **Educação e Estado Civil:**
-        - Certos níveis de educação e estado civil mostram correlações com inadimplência, com pessoas solteiras e com níveis de educação mais baixos apresentando maior risco.
+    fig1 = px.histogram(df, x='AVG_PAY', color='INADIMPLENTE', nbins=20, title='Média de Atrasos de Pagamento (AVG_PAY)')
+    fig1.update_layout(barmode='overlay')
+    fig1.update_traces(opacity=0.75)
+    fig1.update_traces(marker=dict(line=dict(color='black', width=1)))
+    st.plotly_chart(fig1)
 
+    st.write('''
+    2. **Média das Faturas (AVG_BILL_AMT):**
+        - Clientes com faturas médias mais altas também mostram uma tendência maior para inadimplência, especialmente quando combinado com altos atrasos médios.''')
+    
+    fig2 = px.histogram(df, x='AVG_BILL_AMT', color='INADIMPLENTE', nbins=20, title='Média das Faturas (AVG_BILL_AMT)')
+    fig2.update_layout(barmode='overlay')
+    fig2.update_traces(opacity=0.75)
+    fig2.update_traces(marker=dict(line=dict(color='black', width=1)))
+    st.plotly_chart(fig2)
+
+    st.write('''
+    3. **Média dos Pagamentos (AVG_PAY_AMT):**
+        - Clientes que pagam valores médios mais baixos em relação às suas faturas tendem a ser mais propensos a inadimplência.''')
+
+    fig3 = px.histogram(df, x='AVG_PAY_AMT', color='INADIMPLENTE', nbins=20, title='Média dos Pagamentos (AVG_PAY_AMT)')
+    fig3.update_layout(barmode='overlay')
+    fig3.update_traces(opacity=0.75)
+    fig3.update_traces(marker=dict(line=dict(color='black', width=1)))    
+    st.plotly_chart(fig3)
+
+    st.write('''    
+    4. **Limite de Crédito e Idade:**
+        - Embora não seja um indicador isolado forte, combinações de alto limite de crédito com idades extremas (muito jovens ou mais velhos) podem também indicar uma maior propensão para inadimplência.''')
+    
+    fig4 = px.scatter(df, x='LIMIT_BAL', y='AGE', color='INADIMPLENTE', title='Limite de Crédito e Idade')
+    fig4.update_traces(marker=dict(line=dict(color='black', width=1)))  
+    st.plotly_chart(fig4)
+
+    st.write('''
+    5. **Educação e Estado Civil:**
+        - Certos níveis de educação e estado civil mostram correlações com inadimplência, com pessoas solteiras e com níveis de educação mais baixos apresentando maior risco.''')
+
+    fig5 = px.histogram(df, x='EDUCATION', color='INADIMPLENTE', nbins=5, title='Educação e Inadimplência')
+    fig5.update_traces(marker=dict(line=dict(color='black', width=1)))
+    st.plotly_chart(fig5)
+    
+    fig6 = px.histogram(df, x='MARRIAGE', color='INADIMPLENTE', nbins=3, title='Estado Civil e Inadimplência')
+    fig6.update_traces(marker=dict(line=dict(color='black', width=1)))
+    st.plotly_chart(fig6)
+
+    st.write('''
     **Recomendações:**
     - A análise sugere que instituições financeiras devem monitorar mais de perto os clientes com altos atrasos médios e faturas altas, oferecendo suporte e intervenções proativas para mitigar o risco de inadimplência.
     - Implementar políticas de crédito mais restritivas para clientes com histórico de pagamentos problemáticos e considerar esses insights na modelagem de risco de crédito.
