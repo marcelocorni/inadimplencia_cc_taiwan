@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
+from sklearn.ensemble import IsolationForest
+from sklearn.cluster import DBSCAN
+from scipy import stats
 import hashlib
 
 # Configuração da página para modo wide
@@ -288,6 +290,9 @@ elif selection == 'Outliers e Normalização':
         iqr = q3 - q1
         df_iqr = df_filled[~((df_filled < (q1 - 1.5 * iqr)) | (df_filled > (q3 + 1.5 * iqr))).any(axis=1)]
 
+        outliers_iqr_count = df.shape[0] - df_iqr.shape[0]
+        outliers_iqr_percent = (outliers_iqr_count / df.shape[0]) * 100
+
         fig_iqr1 = px.box(df, y='LIMIT_BAL', title='Boxplot do Limite de Crédito (IQR)')
         fig_iqr2 = px.box(df_iqr, y='LIMIT_BAL', title='Boxplot do Limite de Crédito Após Remoção de Outliers (IQR)')
         st.plotly_chart(fig_iqr1)
@@ -296,15 +301,22 @@ elif selection == 'Outliers e Normalização':
         else:
             st.markdown('<span style="color:red">Todos os dados foram removidos como outliers pelo método IQR.</span>', unsafe_allow_html=True)
 
+        if st.button('Remover Outliers (IQR)'):
+            if not df_iqr.empty:
+                df = df_iqr.copy()
+                st.success('Outliers removidos do dataframe original.')
+            else:
+                st.error('Não foi possível remover os outliers, pois todos os dados foram identificados como outliers.')
+
         # Z-Score
         st.subheader('Método Z-Score')
         st.write('O método Z-Score calcula a distância de cada ponto em relação à média em termos de desvios padrão. Valores com um Z-Score maior que 3 ou menor que -3 são considerados outliers.')
-        from scipy import stats
         z_scores = np.abs(stats.zscore(df_filled))
         threshold = 3
         df_zscore = df_filled[(z_scores < threshold).all(axis=1)]
-        st.write('Z-Scores calculados:')
-        st.write(z_scores)
+
+        outliers_zscore_count = df.shape[0] - df_zscore.shape[0]
+        outliers_zscore_percent = (outliers_zscore_count / df.shape[0]) * 100
 
         fig_zscore1 = px.box(df, y='LIMIT_BAL', title='Boxplot do Limite de Crédito (Z-Score)')
         fig_zscore2 = px.box(df_zscore, y='LIMIT_BAL', title='Boxplot do Limite de Crédito Após Remoção de Outliers (Z-Score)')
@@ -313,6 +325,13 @@ elif selection == 'Outliers e Normalização':
             st.plotly_chart(fig_zscore2)
         else:
             st.markdown('<span style="color:red">Todos os dados foram removidos como outliers pelo método Z-Score.</span>', unsafe_allow_html=True)
+
+        if st.button('Remover Outliers (Z-Score)'):
+            if not df_zscore.empty:
+                df = df_zscore.copy()
+                st.success('Outliers removidos do dataframe original.')
+            else:
+                st.error('Não foi possível remover os outliers, pois todos os dados foram identificados como outliers.')
 
         # Modified Z-Score
         st.subheader('Método Modified Z-Score')
@@ -325,8 +344,9 @@ elif selection == 'Outliers e Normalização':
         threshold = 3.5
         mod_z_scores = df_filled.apply(modified_z_score)
         df_mod_zscore = df_filled[(np.abs(mod_z_scores) < threshold).all(axis=1)]
-        st.write('Modified Z-Scores calculados:')
-        st.write(mod_z_scores)
+
+        outliers_mod_zscore_count = df.shape[0] - df_mod_zscore.shape[0]
+        outliers_mod_zscore_percent = (outliers_mod_zscore_count / df.shape[0]) * 100
 
         fig_mod_zscore1 = px.box(df, y='LIMIT_BAL', title='Boxplot do Limite de Crédito (Modified Z-Score)')
         fig_mod_zscore2 = px.box(df_mod_zscore, y='LIMIT_BAL', title='Boxplot do Limite de Crédito Após Remoção de Outliers (Modified Z-Score)')
@@ -336,13 +356,22 @@ elif selection == 'Outliers e Normalização':
         else:
             st.markdown('<span style="color:red">Todos os dados foram removidos como outliers pelo método Modified Z-Score.</span>', unsafe_allow_html=True)
 
+        if st.button('Remover Outliers (Modified Z-Score)'):
+            if not df_mod_zscore.empty:
+                df = df_mod_zscore.copy()
+                st.success('Outliers removidos do dataframe original.')
+            else:
+                st.error('Não foi possível remover os outliers, pois todos os dados foram identificados como outliers.')
+
         # Isolation Forest
         st.subheader('Método Isolation Forest')
         st.write('O método Isolation Forest isola observações ao construir árvores de decisão aleatórias. É eficaz para conjuntos de dados de alta dimensão.')
-        from sklearn.ensemble import IsolationForest
         iso_forest = IsolationForest(contamination=0.1)
         y_pred = iso_forest.fit_predict(df_filled)
         df_iso_forest = df_filled[y_pred != -1]
+
+        outliers_iso_forest_count = df.shape[0] - df_iso_forest.shape[0]
+        outliers_iso_forest_percent = (outliers_iso_forest_count / df.shape[0]) * 100
 
         fig_iso_forest1 = px.box(df, y='LIMIT_BAL', title='Boxplot do Limite de Crédito (Isolation Forest)')
         fig_iso_forest2 = px.box(df_iso_forest, y='LIMIT_BAL', title='Boxplot do Limite de Crédito Após Remoção de Outliers (Isolation Forest)')
@@ -352,13 +381,22 @@ elif selection == 'Outliers e Normalização':
         else:
             st.markdown('<span style="color:red">Todos os dados foram removidos como outliers pelo método Isolation Forest.</span>', unsafe_allow_html=True)
 
+        if st.button('Remover Outliers (Isolation Forest)'):
+            if not df_iso_forest.empty:
+                df = df_iso_forest.copy()
+                st.success('Outliers removidos do dataframe original.')
+            else:
+                st.error('Não foi possível remover os outliers, pois todos os dados foram identificados como outliers.')
+
         # DBSCAN
         st.subheader('Método DBSCAN')
         st.write('O método DBSCAN (Density-Based Spatial Clustering of Applications with Noise) é um algoritmo de clustering que pode identificar outliers como pontos que não pertencem a nenhum cluster denso.')
-        from sklearn.cluster import DBSCAN
         dbscan = DBSCAN(eps=3, min_samples=2)
         clusters = dbscan.fit_predict(df_filled)
         df_dbscan = df_filled[clusters != -1]
+
+        outliers_dbscan_count = df.shape[0] - df_dbscan.shape[0]
+        outliers_dbscan_percent = (outliers_dbscan_count / df.shape[0]) * 100
 
         fig_dbscan1 = px.box(df, y='LIMIT_BAL', title='Boxplot do Limite de Crédito (DBSCAN)')
         fig_dbscan2 = px.box(df_dbscan, y='LIMIT_BAL', title='Boxplot do Limite de Crédito Após Remoção de Outliers (DBSCAN)')
@@ -368,45 +406,88 @@ elif selection == 'Outliers e Normalização':
         else:
             st.markdown('<span style="color:red">Todos os dados foram removidos como outliers pelo método DBSCAN.</span>', unsafe_allow_html=True)
 
+        if st.button('Remover Outliers (DBSCAN)'):
+            if not df_dbscan.empty:
+                df = df_dbscan.copy()
+                st.success('Outliers removidos do dataframe original.')
+            else:
+                st.error('Não foi possível remover os outliers, pois todos os dados foram identificados como outliers.')
+
+        # Gráfico de barras empilhadas com a porcentagem de outliers
+        outliers_data = {
+            'Método': ['IQR', 'Z-Score', 'Modified Z-Score', 'Isolation Forest', 'DBSCAN'],
+            'Outliers Detectados': [outliers_iqr_count, outliers_zscore_count, outliers_mod_zscore_count, outliers_iso_forest_count, outliers_dbscan_count],
+            'Total Dados Originais': [df.shape[0]] * 5
+        }
+        outliers_df = pd.DataFrame(outliers_data)
+
+        outliers_df['Percentual Outliers'] = outliers_df['Outliers Detectados'] / outliers_df['Total Dados Originais'] * 100
+        outliers_df['Percentual Dados Originais'] = 100 - outliers_df['Percentual Outliers']
+
+        fig_bar = px.bar(
+            outliers_df,
+            x='Método',
+            y=['Percentual Outliers', 'Percentual Dados Originais'],
+            title='Percentual de Outliers Detectados por Método',
+            labels={'value': 'Percentual', 'variable': 'Legenda'},
+            color_discrete_map={'Percentual Outliers': 'red', 'Percentual Dados Originais': 'blue'},
+            text_auto=True
+        )
+        fig_bar.update_layout(barmode='stack')
+        st.plotly_chart(fig_bar)
+
         # Seletor de técnica de normalização
         st.subheader('Normalização dos Dados')
         normalization_technique = st.selectbox('Escolha a técnica de normalização:', ['Min-Max Scaling', 'Z-Score Normalization', 'Robust Scaler', 'MaxAbs Scaler', 'Log Transformation'])
 
         if normalization_technique == 'Min-Max Scaling':
             st.write('A normalização Min-Max reescala os valores dos dados para um intervalo específico, geralmente [0, 1].')
-            from sklearn.preprocessing import MinMaxScaler
             scaler = MinMaxScaler()
-            df_normalized = pd.DataFrame(scaler.fit_transform(df_filled), columns=numeric_cols)
+            df_normalized = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
         
         elif normalization_technique == 'Z-Score Normalization':
             st.write('A normalização Z-Score transforma os dados para que tenham média 0 e desvio padrão 1.')
-            from sklearn.preprocessing import StandardScaler
             scaler = StandardScaler()
-            df_normalized = pd.DataFrame(scaler.fit_transform(df_filled), columns=numeric_cols)
+            df_normalized = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
 
         elif normalization_technique == 'Robust Scaler':
             st.write('A normalização Robust Scaler utiliza a mediana e o intervalo interquartil (IQR) para normalizar os dados, sendo robusta contra outliers.')
-            from sklearn.preprocessing import RobustScaler
             scaler = RobustScaler()
-            df_normalized = pd.DataFrame(scaler.fit_transform(df_filled), columns=numeric_cols)
+            df_normalized = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
 
         elif normalization_technique == 'MaxAbs Scaler':
             st.write('A normalização MaxAbs Scaler escala os dados pelo valor absoluto máximo.')
-            from sklearn.preprocessing import MaxAbsScaler
             scaler = MaxAbsScaler()
-            df_normalized = pd.DataFrame(scaler.fit_transform(df_filled), columns=numeric_cols)
+            df_normalized = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
 
         elif normalization_technique == 'Log Transformation':
             st.write('A transformação logarítmica aplica a função logarítmica aos dados para reduzir a variação e tornar a distribuição mais próxima da normal.')
-            df_normalized = df_filled.apply(np.log1p)
+            df_normalized = df.apply(np.log1p)
 
         st.write('Dados após a normalização:')
         st.write(df_normalized.head())
         st.write('Quantidade de registros após a normalização: {}'.format(df_normalized.shape[0]))
 
+        if st.button('Aplicar Normalização nos Dados Originais'):
+            if normalization_technique == 'Min-Max Scaling':
+                scaler = MinMaxScaler()
+                df = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
+            elif normalization_technique == 'Z-Score Normalization':
+                scaler = StandardScaler()
+                df = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
+            elif normalization_technique == 'Robust Scaler':
+                scaler = RobustScaler()
+                df = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
+            elif normalization_technique == 'MaxAbs Scaler':
+                scaler = MaxAbsScaler()
+                df = pd.DataFrame(scaler.fit_transform(df), columns=numeric_cols)
+            elif normalization_technique == 'Log Transformation':
+                df = df.apply(np.log1p)
+            
+            st.success('Normalização aplicada aos dados originais.')
+
     else:
         st.write('Nenhuma coluna numérica encontrada para detecção de outliers e normalização.')
-
 
 elif selection == 'Conclusões':
     # Adicionar coluna de inadimplência
@@ -414,8 +495,7 @@ elif selection == 'Conclusões':
 
     st.header('Conclusões')
 
-    st.write('''
-    1. **Média de Atrasos de Pagamento (AVG_PAY):**
+    st.write('''1. **Média de Atrasos de Pagamento (AVG_PAY):**
         - Clientes com uma média de atrasos mais alta tendem a ter uma maior probabilidade de inadimplência.''')
     
     fig1 = px.histogram(df, x='AVG_PAY', color='INADIMPLENTE', nbins=20, title='Média de Atrasos de Pagamento (AVG_PAY)')
@@ -424,8 +504,7 @@ elif selection == 'Conclusões':
     fig1.update_traces(marker=dict(line=dict(color='black', width=1)))
     st.plotly_chart(fig1)
 
-    st.write('''
-    2. **Média das Faturas (AVG_BILL_AMT):**
+    st.write('''2. **Média das Faturas (AVG_BILL_AMT):**
         - Clientes com faturas médias mais altas também mostram uma tendência maior para inadimplência, especialmente quando combinado com altos atrasos médios.''')
     
     fig2 = px.histogram(df, x='AVG_BILL_AMT', color='INADIMPLENTE', nbins=20, title='Média das Faturas (AVG_BILL_AMT)')
@@ -434,8 +513,7 @@ elif selection == 'Conclusões':
     fig2.update_traces(marker=dict(line=dict(color='black', width=1)))
     st.plotly_chart(fig2)
 
-    st.write('''
-    3. **Média dos Pagamentos (AVG_PAY_AMT):**
+    st.write('''3. **Média dos Pagamentos (AVG_PAY_AMT):**
         - Clientes que pagam valores médios mais baixos em relação às suas faturas tendem a ser mais propensos a inadimplência.''')
 
     fig3 = px.histogram(df, x='AVG_PAY_AMT', color='INADIMPLENTE', nbins=20, title='Média dos Pagamentos (AVG_PAY_AMT)')
@@ -444,16 +522,14 @@ elif selection == 'Conclusões':
     fig3.update_traces(marker=dict(line=dict(color='black', width=1)))
     st.plotly_chart(fig3)
 
-    st.write('''
-    4. **Limite de Crédito e Idade:**
+    st.write('''4. **Limite de Crédito e Idade:**
         - Embora não seja um indicador isolado forte, combinações de alto limite de crédito com idades extremas (muito jovens ou mais velhos) podem também indicar uma maior propensão para inadimplência.''')
     
     fig4 = px.scatter(df, x='LIMIT_BAL', y='AGE', color='INADIMPLENTE', title='Limite de Crédito e Idade')
     fig4.update_traces(marker=dict(line=dict(color='black', width=1)))
     st.plotly_chart(fig4)
 
-    st.write('''
-    5. **Educação e Estado Civil:**
+    st.write('''5. **Educação e Estado Civil:**
         - Certos níveis de educação e estado civil mostram correlações com inadimplência, com pessoas solteiras e com níveis de educação mais baixos apresentando maior risco.''')
 
     fig5 = px.histogram(df, x='EDUCATION', color='INADIMPLENTE', nbins=5, title='Educação e Inadimplência')
@@ -469,4 +545,3 @@ elif selection == 'Conclusões':
     - A análise sugere que instituições financeiras devem monitorar mais de perto os clientes com altos atrasos médios e faturas altas, oferecendo suporte e intervenções proativas para mitigar o risco de inadimplência.
     - Implementar políticas de crédito mais restritivas para clientes com histórico de pagamentos problemáticos e considerar esses insights na modelagem de risco de crédito.
     ''')
-
