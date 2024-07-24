@@ -98,7 +98,7 @@ elif selection == 'Análise e Tratamento de Dados':
     st.write('» Coluna que estava sem header no arquivo foi removida')
     st.write('» Coluna PAY_1 foi renomeada para manter o padrão dos demais campos')
     st.subheader('Substituição de valores faltantes e tratamento de inconsistências.')
-    st.write('» Colunas de PAY_1 a PAY_6 foram preenchidas os valores nulos ou na com 0 (sem consumo) e convertido o tipo para int')
+    st.write('» Colunas de PAY_1 a PAY_6 foram preenchidas os valores nulos ou na com -2 (sem consumo) e convertido o tipo para int')
     st.write('» Colunas BILL_AMT1 a BILL_AMT6 e PAY_AMT1 a PAY_AMT6 foram preenchidas os valores nulos ou na com 0')  
     st.write('» Coluna MARRIAGE foi agrupada os valores que dizem a mesma coisa em um único valor')
     st.write('» Coluna EDUCATION foi agrupada os valores que dizem a mesma coisa em um único valor')    
@@ -246,7 +246,7 @@ elif selection == 'Análise Gráfica':
     st.plotly_chart(fig4)
     st.plotly_chart(fig5)
     st.plotly_chart(fig6)
-   
+
     # Matriz de Correlação
     # Selecionar apenas as colunas numéricas
     numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -409,7 +409,7 @@ elif selection == 'Outliers e Normalização':
 
 
 elif selection == 'Conclusões':
-     # Adicionar coluna de inadimplência
+    # Adicionar coluna de inadimplência
     df['INADIMPLENTE'] = df['DEFAULT_PAYMENT']
 
     st.header('Conclusões')
@@ -441,15 +441,15 @@ elif selection == 'Conclusões':
     fig3 = px.histogram(df, x='AVG_PAY_AMT', color='INADIMPLENTE', nbins=20, title='Média dos Pagamentos (AVG_PAY_AMT)')
     fig3.update_layout(barmode='overlay')
     fig3.update_traces(opacity=0.75)
-    fig3.update_traces(marker=dict(line=dict(color='black', width=1)))    
+    fig3.update_traces(marker=dict(line=dict(color='black', width=1)))
     st.plotly_chart(fig3)
 
-    st.write('''    
+    st.write('''
     4. **Limite de Crédito e Idade:**
         - Embora não seja um indicador isolado forte, combinações de alto limite de crédito com idades extremas (muito jovens ou mais velhos) podem também indicar uma maior propensão para inadimplência.''')
     
     fig4 = px.scatter(df, x='LIMIT_BAL', y='AGE', color='INADIMPLENTE', title='Limite de Crédito e Idade')
-    fig4.update_traces(marker=dict(line=dict(color='black', width=1)))  
+    fig4.update_traces(marker=dict(line=dict(color='black', width=1)))
     st.plotly_chart(fig4)
 
     st.write('''
