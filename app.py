@@ -214,7 +214,52 @@ elif selection == 'Análise Gráfica':
         'BILL_AMT5': st.sidebar.slider('Fatura - Maio', float(df['BILL_AMT5'].min()), float(df['BILL_AMT5'].max()), (float(df['BILL_AMT5'].min()), float(df['BILL_AMT5'].max()))),
         'BILL_AMT6': st.sidebar.slider('Fatura - Abril', float(df['BILL_AMT6'].min()), float(df['BILL_AMT6'].max()), (float(df['BILL_AMT6'].min()), float(df['BILL_AMT6'].max())))
     }
+
+    # Gráficos de barras empilhadas para dados demográficos
+    demographic_cols = ['SEX', 'MARRIAGE', 'EDUCATION']
+    demographic_titles = ['Sexo', 'Estado Civil', 'Educação']
+    demographic_labels = {
+        'SEX': {1: 'Masculino', 2: 'Feminino'},
+        'MARRIAGE': {1: 'Casado', 2: 'Solteiro', 3: 'Outros'},
+        'EDUCATION': {1: 'Pós-graduação', 2: 'Universidade', 3: 'Ensino Médio', 4: 'Outros'}
+    }
+
+    for col, title in zip(demographic_cols, demographic_titles):
+        demographic_counts = df[col].value_counts(normalize=True).reset_index()
+        demographic_counts.columns = [col, 'percent']
+        demographic_counts['percent'] *= 100
+        demographic_counts[col] = demographic_counts[col].map(demographic_labels[col])
+
+        fig_demographic = px.bar(
+            demographic_counts,
+            x=col,
+            y='percent',
+            title=f'Percentual de {title} em Relação ao Total de Registros',
+            labels={'percent': 'Percentual', col: title},
+            text='percent'
+        )
+        fig_demographic.update_layout(barmode='stack')
+        st.plotly_chart(fig_demographic)
     
+    # Gráfico de barras empilhadas para faixa etária
+    age_bins = pd.cut(df['AGE'], bins=[20, 30, 40, 50, 60, 70, 80])
+    age_counts = age_bins.value_counts(normalize=True).reset_index()
+    age_counts.columns = ['Faixa Etária', 'percent']
+    age_counts['percent'] *= 100
+    age_counts['Faixa Etária'] = age_counts['Faixa Etária'].astype(str)
+
+    fig_age = px.bar(
+        age_counts,
+        x='Faixa Etária',
+        y='percent',
+        title='Percentual de Faixa Etária em Relação ao Total de Registros',
+        labels={'percent': 'Percentual', 'Faixa Etária': 'Faixa Etária'},
+        text='percent'
+    )
+    fig_age.update_layout(barmode='stack')
+    st.plotly_chart(fig_age)
+
+
     filtered_df = df.copy()
     if sex_filter != 0:
         filtered_df = filtered_df[filtered_df['SEX'] == sex_filter]
