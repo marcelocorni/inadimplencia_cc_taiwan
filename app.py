@@ -295,11 +295,15 @@ elif selection == 'Análise Gráfica':
     st.plotly_chart(fig6)
 
     # Matriz de Correlação
-    # Selecionar apenas as colunas numéricas
-    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    # Selecionar apenas as colunas específicas
+    cols_of_interest = [
+        'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6',
+        'BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3', 'BILL_AMT4', 'BILL_AMT5', 'BILL_AMT6',
+        'AVG_PAY_AMT', 'AVG_BILL_AMT', 'TOTAL_BILL_AMT', 'TOTAL_PAY_AMT'
+    ]
 
     # Calcular a matriz de correlação
-    corr_matrix = df[numeric_cols].corr()
+    corr_matrix = df[cols_of_interest].corr()
 
     # Plotar a matriz de correlação usando Plotly
     fig_corr = px.imshow(corr_matrix, 
