@@ -299,7 +299,7 @@ elif selection == 'Análise Gráfica':
     cols_of_interest = [
         'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6',
         'BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3', 'BILL_AMT4', 'BILL_AMT5', 'BILL_AMT6',
-        'AVG_PAY_AMT', 'AVG_BILL_AMT', 'TOTAL_BILL_AMT', 'TOTAL_PAY_AMT'
+        'AVG_PAY_AMT', 'AVG_BILL_AMT', 'TOTAL_BILL_AMT', 'TOTAL_PAY_AMT', 'DEFAULT_PAYMENT'
     ]
 
     # Calcular a matriz de correlação
