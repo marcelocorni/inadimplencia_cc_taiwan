@@ -130,7 +130,7 @@ elif selection == 'Análise e Tratamento de Dados':
     df['AVG_PAY'] = df['AVG_PAY'].fillna(0.0)
     df['AVG_PAY_AMT'] = df['AVG_PAY_AMT'].fillna(0.0)
     
-    df['DEFAULT_PAYMENT'] = df['DEFAULT_PAYMENT'].fillna(-2.0)
+    df['DEFAULT_PAYMENT'] = df['DEFAULT_PAYMENT'].fillna(0.0)
     df['DEFAULT_PAYMENT'] = df['DEFAULT_PAYMENT'].astype(int)
 
     st.subheader('Colunas com valores nulos depois dos tratamentos')
